@@ -10,65 +10,10 @@ import BookDetail from "./BookDetail";
 class App extends Component {
     constructor(props) {
         super(props);
-        this.search = this.search.bind(this);
-        this.loadMoreTweets = this.loadMoreTweets.bind(this);
-        this.onTweetsUpdated = this.onTweetsUpdated.bind(this);
         this.state = {
-            tweets: [],
-            isLoading: false,
-            nextURL: '',
             title: 'GoodReads',
             isHome: window.location.pathname === "/"
         };
-    }
-
-    loadMoreTweets() {
-        console.log("Loading: " + this.state.isLoading);
-        if (!this.state.isLoading) {
-            this.setState({isLoading: true});
-            this.fetchTweets(this.state.nextURL).then((tweets, next) => {
-                this.onTweetsUpdated(this.state.tweets.concat(tweets), next);
-            });
-        }
-    }
-
-    fetchTweets(url) {
-        return new Promise(function (resolve, reject) {
-            fetch(url)
-                .then(
-                    function (response) {
-                        if (response.status !== 200) {
-                            console.log('Looks like there was a problem. Status Code: ' +
-                                response.status);
-                            return;
-                        }
-
-                        // Examine the text in the response
-                        response.json().then(function (data) {
-                            console.log(data.tweets, data.nextURL);
-                            resolve(data.tweets, data.nextURL);
-                            console.log(this.state.tweets);
-                        });
-                    }
-                )
-                .catch(function (err) {
-                    console.log('Fetch Error :-S', err);
-                    reject(err);
-                });
-
-        });
-    }
-
-    onTweetsUpdated(tweets, next) {
-        console.log("gtt");
-        this.setState({tweets: tweets, nextURL: next, isLoading: false});
-    }
-
-    search(query) {
-
-        console.log("Searched " + query);
-        this.setState({isLoading: true});
-        this.fetchTweets("./tweets?keyword=" + query).then(this.onTweetsUpdated);
     }
 
     render() {
@@ -104,5 +49,4 @@ class App extends Component {
         );
     }
 }
-
 export default App;

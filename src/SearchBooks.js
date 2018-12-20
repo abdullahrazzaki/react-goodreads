@@ -80,29 +80,30 @@ class SearchBooks extends Component {
                         <Search search={this.search} onTyped={this.onTyped}/>
                     </Col>
                 </Row>
+                {!this.state.hideSuggestions &&
                 <Row>
                     <Col md={{size: 8, offset: 2}}>
-                        {!this.state.hideSuggestions &&
+
                         <OutsideAlerter onClickOutside={this.closeSuggestions} children={
                             <div>
                                 <BookList onEndReached={() => {
                                 }} books={this.state.suggestions}/>
-                                {this.state.remainingCount > 0 && <button
+                                {this.state.remainingCount > 0 &&
+                                <button
                                     onClick={() => this.props.history.push("/results/" + this.state.keyword)}>{this.state.remainingCount} more
                                     Results</button>}
                             </div>
                         }
 
-                        />}
+                        />
                         {this.state.suggestions.length === 0 && this.state.typed && !this.state.isLoading &&
                         <Alert color={"info"}>No Results </Alert>}
                     </Col>
-                </Row>
+                </Row>}
             </Container>
         );
     }
 }
-
 SearchBooks.propTypes = {
     setTitle: PropTypes.func.isRequired
 };
