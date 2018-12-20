@@ -25,7 +25,7 @@ class BookList extends Component {
     render() {
         console.log("renering list" + this.props.books.length);
         let items = this.props.books.map((book) => {
-            return <BookItem book={book}/>
+            return <BookItem key={book.id} book={book}/>
         });
         return (
             <ListGroup id={"bookList"} className={"mb-5"}>

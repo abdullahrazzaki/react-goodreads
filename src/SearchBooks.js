@@ -4,6 +4,7 @@ import BookList from "./BookList";
 import PropTypes from 'prop-types';
 import {Alert, Col, Container, Row} from 'reactstrap';
 import OutsideAlerter from "./OutsideAlerter";
+import BookSuggestion from "./Book";
 
 class SearchBooks extends Component {
     constructor(props) {
@@ -26,7 +27,11 @@ class SearchBooks extends Component {
         console.log("Typed : " + query);
         this.setState({hideSuggestions: false, typed: true});
         this.fetchBooks("/suggestions?keyword=" + query).then((res) => {
-            this.setState({suggestions: res.suggestions, remainingCount: res.count, keyword: query});
+            this.setState({
+                suggestions: res.suggestions.map((book) => new BookSuggestion(book.id, book.title, book.author)),
+                remainingCount: res.count,
+                keyword: query
+            });
         });
     }
 

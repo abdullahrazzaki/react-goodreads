@@ -63,7 +63,7 @@ class BookDetail extends Component {
                         </Col>
                         <Col md={{size: 4}}>
                             <h3>{this.state.book.title}</h3>
-                            {this.state.book.authors.map((author) => <h4>{author}</h4>)}
+                            {this.state.book.authors.map((author) => <h4 key={author}>{author}</h4>)}
                             <p>{this.state.book.rating}</p>
                             <div dangerouslySetInnerHTML={{__html: this.state.book.review_widget}}>
                             </div>
