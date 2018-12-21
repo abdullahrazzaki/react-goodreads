@@ -2,29 +2,26 @@ import React, {Component} from 'react';
 import './App.css';
 import Header from "./Header";
 import {Container, Row} from 'reactstrap';
-import {BrowserRouter as Router, Route} from "react-router-dom";
+import {Route} from "react-router-dom";
 import SearchBooks from "./SearchBooks";
 import SearchResult from "./SearchResult";
 import BookDetail from "./BookDetail";
+import {connect} from "react-redux"
+import {changeTitle} from "./actions";
+import {ConnectedRouter} from 'connected-react-router'
 
 class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            title: 'GoodReads',
-            isHome: window.location.pathname === "/"
-        };
+    componentDidUpdate() {
+        console.log(this.props);
     }
-
     render() {
-        const setTitle = (title) => this.setState({title: title});
+        const setTitle = this.props.setTitle;//.setState({title: title});
         return (
             <div className="App">
                 <main>
-                    <Router>
+                    <ConnectedRouter history={this.props.history}>
                         <div>
-
-                            <Header isHome={this.state.isHome} title={this.state.title}/>
+                            <Header isHome={this.props.isHome} title={this.props.title}/>
                             <Container fluid={true}>
                                 <Row className={"mt-3"}>
                                     <Route
@@ -43,10 +40,25 @@ class App extends Component {
                                 </Row>
                             </Container>
                         </div>
-                    </Router>
+                    </ConnectedRouter>
                 </main>
             </div>
         );
     }
 }
-export default App;
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setTitle: (title) => {
+            dispatch(changeTitle(title))
+        }
+    }
+};
+const mapStateToProps = (state, ownProps) => {
+    console.log("State", state);
+    let {
+        isHome, title
+    } = state.navigation;
+    return {ownProps, isHome: isHome, title: title};
+};
+export default connect(mapStateToProps, mapDispatchToProps)(App);

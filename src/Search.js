@@ -6,7 +6,7 @@ class Search extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            input: '',
+            input: this.props.value,
             searchValue: ''
         };
         this.inputChanged = this.inputChanged.bind(this);
@@ -39,6 +39,7 @@ class Search extends Component {
 
 Search.propTypes =
     {
+        value: PropTypes.string.isRequired,
         search: PropTypes.func.isRequired,
         onTyped: PropTypes.func.isRequired
     };

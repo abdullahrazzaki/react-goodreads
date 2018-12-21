@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Card} from 'reactstrap';
 import Book from './Book';
-import {withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
+import {selectBook} from "./actions";
 
 class BookItem extends Component {
     constructor(props) {
@@ -11,7 +12,7 @@ class BookItem extends Component {
     }
 
     onClick() {
-        this.props.history.push("/book/" + this.props.book.id);
+        this.props.selectBook(this.props.book.id);
     }
 
     render() {
@@ -27,8 +28,13 @@ class BookItem extends Component {
     }
 }
 
+const mapDispatchToProps = function (dispatch) {
+    return {
+        selectBook: (id) => dispatch(selectBook(id))
+    }
+};
 BookItem.propTypes =
     {
         book: PropTypes.instanceOf(Book).isRequired
     };
-export default withRouter(BookItem);
+export default connect(null, mapDispatchToProps)(BookItem);

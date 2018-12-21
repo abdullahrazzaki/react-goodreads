@@ -114,7 +114,14 @@ app.get("/book", function (req, res) {
 //            review_widget = review_widget.split("</reviews_widget>")[0];//(widget_regex);//bookObj.getElementsByTagName("reviews_widget")[0];
 
             console.log(review_widget);
-            const result = {authors: authors, image: image, title: title, review_widget: review_widget, rating: rating};
+            const result = {
+                id: id,
+                authors: authors,
+                image: image,
+                title: title,
+                review_widget: review_widget,
+                rating: rating
+            };
             //          console.log(result);
             res.json(result);
         }).catch((res) => console.log(res));

@@ -4,70 +4,40 @@ import BookList from "./BookList";
 import PropTypes from 'prop-types';
 import {Alert, Col, Container, Row} from 'reactstrap';
 import OutsideAlerter from "./OutsideAlerter";
-import BookSuggestion from "./Book";
+import {connect} from 'react-redux';
+import {changeTitle, onTyped, searchKeyword} from "./actions";
 
 class SearchBooks extends Component {
     constructor(props) {
         super(props);
-        this.search = this.search.bind(this);
-        this.onBooksUpdated = this.onBooksUpdated.bind(this);
         this.closeSuggestions = this.closeSuggestions.bind(this);
         this.onTyped = this.onTyped.bind(this);
         this.state = {
-            keyword: '',
-            suggestions: [],
-            remainingCount: 0,
             hideSuggestions: false,
             typed: false
         };
         props.setTitle("Search Books");
+        console.log(props);
+
     }
 
     onTyped(query) {
         console.log("Typed : " + query);
         this.setState({hideSuggestions: false, typed: true});
-        this.fetchBooks("/suggestions?keyword=" + query).then((res) => {
-            this.setState({
-                suggestions: res.suggestions.map((book) => new BookSuggestion(book.id, book.title, book.author)),
-                remainingCount: res.count,
-                keyword: query
-            });
-        });
+        this.props.onTyped(query);
+        // this.fetchBooks("/suggestions?keyword=" + query).then((res) => {
+        //     this.setState({
+        //         suggestions: res.suggestions.map((book) => new BookSuggestion(book.id, book.title, book.author)),
+        //         remainingCount: res.count,
+        //         keyword: query
+        //     });
+        // });
     }
 
-    fetchBooks(url) {
-        return new Promise(function (resolve, reject) {
-            fetch(url)
-                .then(
-                    function (response) {
-                        if (response.status !== 200) {
-                            console.log('Looks like there was a problem. Status Code: ' +
-                                response.status);
-                            return;
-                        }
-                        // Examine the text in the response
-                        response.json().then(function (data) {
-                            resolve(data);
-                        });
-                    }
-                )
-                .catch(function (err) {
-                    console.log('Fetch Error :-S', err);
-                    reject(err);
-                });
-
-        });
+    search(text) {
+        this.props.search(text);
+        this.props.history.push("/results/" + text);
     }
-
-    onBooksUpdated(books) {
-        console.log("gtt");
-        this.setState({suggestions: books, isLoading: false});
-    }
-
-    search(query) {
-        this.props.history.push("/results/" + query);
-    }
-
     closeSuggestions() {
         this.setState({suggestions: [], remainingCount: 0, hideSuggestions: true});
     }
@@ -77,7 +47,7 @@ class SearchBooks extends Component {
             <Container fluid={true}>
                 <Row>
                     <Col md={{size: 6, offset: 3}}>
-                        <Search search={this.search} onTyped={this.onTyped}/>
+                        <Search value={this.props.keyword} search={this.props.search} onTyped={this.onTyped}/>
                     </Col>
                 </Row>
                 {!this.state.hideSuggestions &&
@@ -87,16 +57,16 @@ class SearchBooks extends Component {
                         <OutsideAlerter onClickOutside={this.closeSuggestions} children={
                             <div>
                                 <BookList onEndReached={() => {
-                                }} books={this.state.suggestions}/>
-                                {this.state.remainingCount > 0 &&
+                                }} books={this.props.suggestions}/>
+                                {this.props.remainingResults > 0 &&
                                 <button
-                                    onClick={() => this.props.history.push("/results/" + this.state.keyword)}>{this.state.remainingCount} more
+                                    onClick={() => this.search(this.props.keyword)}>{this.props.remainingResults} more
                                     Results</button>}
                             </div>
                         }
 
                         />
-                        {this.state.suggestions.length === 0 && this.state.typed && !this.state.isLoading &&
+                        {this.props.suggestions.length === 0 && this.state.typed && !this.state.isLoading &&
                         <Alert color={"info"}>No Results </Alert>}
                     </Col>
                 </Row>}
@@ -104,8 +74,29 @@ class SearchBooks extends Component {
         );
     }
 }
-SearchBooks.propTypes = {
-    setTitle: PropTypes.func.isRequired
+
+const mapStateToProps = (state) => {
+    console.log(state);
+    const {typedWord: keyword, suggestions, remainingResults} = state.suggestion;
+    return {keyword: keyword, suggestions: suggestions, remainingResults: remainingResults};
+};
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setTitle: (title) => {
+            dispatch(changeTitle(title))
+        },
+        onTyped: (text) => {
+            dispatch(onTyped(text))
+        },
+        search: (text) => {
+            dispatch(searchKeyword(text))
+        }
+    };
 };
 
-export default SearchBooks;
+SearchBooks.propTypes = {
+    setTitle: PropTypes.func.isRequired,
+    keyword: PropTypes.string.isRequired
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBooks);
