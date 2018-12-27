@@ -40,7 +40,6 @@ class SearchBooks extends Component<Props, State> {
       typed: false
     };
     props.setTitle("Search Books");
-    console.log(props);
   }
 
   onTyped(query: string) {

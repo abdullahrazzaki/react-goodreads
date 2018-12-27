@@ -5,6 +5,8 @@ import { connect } from "react-redux";
 import { SearchActions, BookActions } from "../actions";
 import Loading from "./Loader/Loading";
 import { BookTypes } from "../types";
+import { slice, unionWith, prop } from "ramda";
+import eqBy from "ramda/es/eqBy";
 const { loadMore, search } = SearchActions;
 const { selectBook } = BookActions;
 type OwnProps = {
@@ -40,47 +42,44 @@ class SearchResult extends Component<Props, State> {
   }
 
   scrolledToBottom() {
-    console.log(
-      "results: " + this.props.results.length,
-      "rendered: " + this.state.renderedResults.length,
-      "Loading : " + this.state.isLoading
-    );
-    if (!this.props.isLoading) {
+    const { isLoading, loadMore, keyword, nextPage, results } = this.props;
+
+    if (!isLoading) {
       this.setState({
         isLoading: true
       });
-      let remainingLoaded =
-        this.props.results.length - this.state.renderedResults.length;
+      let remainingLoaded = results.length - this.state.renderedResults.length;
       if (remainingLoaded > 0) {
         //show exisiting
-        const results = this.props.results;
         this.setState(state => {
           const index = results.length - remainingLoaded;
           console.log(index);
           return {
-            renderedResults: state.renderedResults.concat(
-              results.slice(index, index + 10)
+            renderedResults: unionWith(
+              eqBy(prop("id")),
+              state.renderedResults,
+              slice(index, index + 10, results)
             ),
             isLoading: false
           };
         });
         remainingLoaded -= 10;
       }
-      if (remainingLoaded < 10 && this.props.nextPage > 0) {
+      if (remainingLoaded < 10 && nextPage > 0) {
         //load more
-        this.props.loadMore(this.props.keyword, this.props.nextPage);
+        loadMore(keyword, nextPage);
       }
     }
   }
 
   componentWillMount() {
-    this.setState({ renderedResults: this.props.results.slice(0, 10) });
+    this.setState({ renderedResults: slice(0, 10, this.props.results) });
   }
 
   componentDidUpdate() {
     const { results } = this.props;
     if (this.state.renderedResults.length === 0 && results.length > 0)
-      this.setState({ renderedResults: results.slice(0, 10) });
+      this.setState({ renderedResults: slice(0, 10, results) });
   }
 
   render() {
